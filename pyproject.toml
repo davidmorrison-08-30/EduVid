@@ -1,0 +1,28 @@
+[project]
+name = "eduvid"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "davidng", email = "21521009@gm.uit.edu.vn" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "bedrock-agentcore>=1.23.1",
+    "boto3>=1.43.98",
+    "fastapi>=0.141.1",
+    "httpx>=0.28.1",
+    "langgraph>=1.2.11",
+    "manim>=0.21.0",
+    "pydantic>=2.13.5",
+    "python-dotenv>=1.2.3",
+    "strands-agents>=1.56.0",
+    "uvicorn[standard]>=0.53.0",
+]
+
+[project.scripts]
+eduvid = "eduvid:main"
+
+[build-system]
+requires = ["uv_build>=0.12.17,<0.13.0"]
+build-backend = "uv_build"
