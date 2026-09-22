@@ -20,3 +20,6 @@ outputs/
 
 # client code
 client_call.py
+
+# ECS task definition
+task-definition.json
