@@ -31,6 +31,9 @@ RUN uv sync --frozen --no-cache --no-install-project
 # Copy agent file
 COPY main.py ./
 
+# Copy app
+COPY app ./app
+
 # Expose port
 EXPOSE 8088
 
