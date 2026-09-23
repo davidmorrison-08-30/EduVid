@@ -1,8 +1,8 @@
-from app.graph import workflow
+from .app.graph import workflow
 from typing import Dict, Any, Optional
 from bedrock_agentcore.runtime import BedrockAgentCoreApp
 from fastapi import FastAPI
-from app.schemas import GenerateRequest, GenerateResponse
+from .app.schemas import GenerateRequest, GenerateResponse
 
 app = FastAPI(title="Chemistry Concept Video Generator", version="1.0.0")
 

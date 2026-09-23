@@ -22,20 +22,14 @@ ENV PATH="/root/.local/bin/:$PATH"
 
 WORKDIR /app
 
-# Copy uv files
 COPY pyproject.toml uv.lock ./
+COPY src ./src
 
 # Install dependencies (including strands-agents)
-RUN uv sync --frozen --no-cache --no-install-project
-
-# Copy agent file
-COPY main.py ./
-
-# Copy app
-COPY app ./app
+RUN uv sync --frozen --no-cache
 
 # Expose port
 EXPOSE 8088
 
 # Run application
-CMD ["uv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8088"]
+CMD ["uv", "run", "uvicorn", "eduvid.main:app", "--host", "0.0.0.0", "--port", "8088"]
