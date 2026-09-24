@@ -23,7 +23,7 @@ def get_client():
     """Build a cached Bedrock Runtime client authenticated via the API key."""
     cfg = get_llm_config()
     # The Bedrock API key is consumed by botocore as a bearer token.
-    os.environ.setdefault("AWS_BEARER_TOKEN_BEDROCK", cfg.api_key)
+    os.environ["AWS_BEARER_TOKEN_BEDROCK"] = cfg.api_key
     return boto3.client("bedrock-runtime", region_name=cfg.region)
 
 
