@@ -23,5 +23,4 @@ client_call.py
 
 # ECS task & role definition
 task-definition.json
-ecs-task-role-trust-policy.json
-ecs-task-execution-role-trust-policy.json
+ecs*.json

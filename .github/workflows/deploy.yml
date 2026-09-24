@@ -88,6 +88,15 @@ jobs:
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
 
+      - name: Create .env file
+        env:
+          # Pass required secrets into step environment variables
+          AWS_BEARER_TOKEN_BEDROCK: ${{ secrets.AWS_API_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_MODEL: ${{ secrets.AWS_MODEL }}
+        run: |
+          envsubst < .env.example > .env
+
       - name: Deploy to Amazon ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
