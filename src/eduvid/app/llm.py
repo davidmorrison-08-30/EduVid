@@ -22,7 +22,7 @@ from .config import get_llm_config
 @lru_cache(maxsize=1)
 def get_client():
     """Build a cached Bedrock Runtime client authenticated via the API key."""
-    cfg = get_llm_config()
+    cfg = get_llm_config("eduvid-secrets")
     # The Bedrock API key is consumed by botocore as a bearer token.
     os.environ["AWS_BEARER_TOKEN_BEDROCK"] = cfg.bedrock_token
     return boto3.client("bedrock-runtime", region_name=cfg.region)
@@ -54,7 +54,7 @@ def chat(
     max_tokens: int = 4096,
 ) -> str:
     """Run a Bedrock converse call and return the assistant text content."""
-    cfg = get_llm_config()
+    cfg = get_llm_config("eduvid-secrets")
     system, converse_messages = _to_converse(messages)
 
     kwargs: dict[str, Any] = {

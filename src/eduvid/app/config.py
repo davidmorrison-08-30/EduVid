@@ -25,9 +25,7 @@ class LLMConfig:
     model: str
 
 
-def get_secret(secret_key: str):
-
-    secret_name = secret_key
+def get_secrets(secret_name: str):
 
     # Create a Secrets Manager client
     session = boto3.session.Session()
@@ -40,15 +38,16 @@ def get_secret(secret_key: str):
         SecretId=secret_name
     )
 
-    secret = get_secret_value_response['SecretString']
-    return secret
+    secret_json = get_secret_value_response['SecretString']
+    return json.loads(secret_json)
 
 
 @lru_cache(maxsize=1)
-def get_llm_config() -> LLMConfig:
+def get_llm_config(secret_name: str) -> LLMConfig:
     """Read the Amazon Bedrock LLM settings from config.json."""
+    all_secrets = get_secret(secret_name)
     return LLMConfig(
-        bedrock_token=get_secret("AWS_BEARER_TOKEN_BEDROCK"),
-        region=get_secret("AWS_REGION"),
-        model=get_secret("AWS_MODEL"),
+        bedrock_token=all_secrets["AWS_BEARER_TOKEN_BEDROCK"],
+        region=all_secrets["AWS_REGION"],
+        model=all_secrets["AWS_MODEL"],
     )
