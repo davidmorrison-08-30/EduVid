@@ -70,6 +70,16 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Create .env file
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          # Pass required secrets into step environment variables
+          envkey_AWS_API_KEY: ${{ secrets.AWS_API_KEY }}
+          envkey_AWS_REGION: ${{ secrets.AWS_REGION }}
+          envkey_AWS_MODEL: ${{ secrets.AWS_MODEL }}
+          filename: .env
+          fail_on_empty: true
+
       - name: Build, tag, and push image
         id: build-image
         env:
@@ -87,16 +97,6 @@ jobs:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
-
-      - name: Create .env file
-        uses: SpicyPizza/create-envfile@v2.0
-        with:
-          # Pass required secrets into step environment variables
-          envkey_AWS_API_KEY: ${{ secrets.AWS_API_KEY }}
-          envkey_AWS_REGION: ${{ secrets.AWS_REGION }}
-          envkey_AWS_MODEL: ${{ secrets.AWS_MODEL }}
-          filename: .env
-          fail_on_empty: true
 
       - name: Deploy to Amazon ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
