@@ -45,7 +45,7 @@ def get_secrets(secret_name: str):
 @lru_cache(maxsize=1)
 def get_llm_config(secret_name: str) -> LLMConfig:
     """Read the Amazon Bedrock LLM settings from config.json."""
-    all_secrets = get_secret(secret_name)
+    all_secrets = get_secrets(secret_name)
     return LLMConfig(
         bedrock_token=all_secrets["AWS_BEARER_TOKEN_BEDROCK"],
         region=all_secrets["AWS_REGION"],
