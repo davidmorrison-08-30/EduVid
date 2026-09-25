@@ -29,7 +29,7 @@ def get_client():
     logging.info(f"env AWS MODEL: {os.getenv("AWS_MODEL")}")
     logging.info(f"AWS MODEL: {cfg.model}")
     logging.info(f"REGION: {cfg.region}")
-    os.environ["AWS_BEARER_TOKEN_BEDROCK"] = cfg.api_key
+    os.environ["AWS_BEARER_TOKEN_BEDROCK"] = os.getenv("AWS_API_KEY")
     return boto3.client("bedrock-runtime", region_name=cfg.region)
 
 
