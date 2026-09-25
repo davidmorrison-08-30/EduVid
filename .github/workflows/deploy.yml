@@ -15,9 +15,6 @@ env:
   ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
   ECS_TASK_DEFINITION: task-definition.json
   CONTAINER_NAME: ${{ secrets.REPO_NAME }}
-  AWS_API_KEY: ${{ secrets.AWS_API_KEY }}
-  AWS_REGION: ${{ secrets.AWS_REGION }}
-  AWS_MODEL: ${{ secrets.AWS_MODEL }}
 
 jobs:
   deploy:
@@ -90,6 +87,15 @@ jobs:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
+
+      - name: Create .env file
+        env:
+          # Pass required secrets into step environment variables
+          AWS_API_KEY: ${{ secrets.AWS_API_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_MODEL: ${{ secrets.AWS_MODEL }}
+        run: |
+          envsubst < .env.example > .env
 
       - name: Deploy to Amazon ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
