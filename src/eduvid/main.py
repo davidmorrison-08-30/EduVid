@@ -23,7 +23,7 @@ async def generate(request: GenerateRequest):
         initial_state
     )
 
-    return {"output_dir": result.get("video_path")}
+    return {"output_dir": result.get("video_path"), "s3_key": result.get("s3_key")}
 
 @app.get("/ping")
 async def ping():

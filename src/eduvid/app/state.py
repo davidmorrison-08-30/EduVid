@@ -37,4 +37,5 @@ class WorkflowState(TypedDict, total=False):
     codegen_iterations: int
     alignment_iterations: int
     video_path: Optional[str]
+    s3_key: Optional[str]
     error: Optional[str]

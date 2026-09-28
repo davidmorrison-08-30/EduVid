@@ -24,3 +24,6 @@ client_call.py
 # ECS task & role definition
 task-definition.json
 ecs*.json
+
+# bash files
+*.sh

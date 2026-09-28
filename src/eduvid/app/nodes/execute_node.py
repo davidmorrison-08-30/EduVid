@@ -14,12 +14,21 @@ import sys
 import tempfile
 from pathlib import Path
 
+import uuid
+
+import boto3
+from botocore.exceptions import ClientError
+
 from ..config import OUTPUT_DIR, RENDER_TIMEOUT_SECONDS
 from ..prompts import SCENE_CLASS_NAME
 from ..state import WorkflowState
 
 # Environment variables that are safe/necessary to forward to the renderer.
 _ENV_PASSTHROUGH = ("PATH", "LANG", "LC_ALL", "LC_CTYPE")
+
+S3_BUCKET: str = "eduvid-storage" 
+S3_PREFIX = "videos"
+PRESIGNED_URL_EXPIRATION = 7 * 24 * 60 * 60 
 
 
 def _build_env(sandbox: Path) -> dict[str, str]:
@@ -36,6 +45,52 @@ def _build_env(sandbox: Path) -> dict[str, str]:
 def _truncate(text: str, limit: int = 2000) -> str:
     text = text.strip()
     return text if len(text) <= limit else text[-limit:]
+
+
+def _upload_to_s3(local_path: Path) -> tuple[str, str]:
+    """Upload video to S3 and return (s3_key, presigned_url).
+    
+    Args:
+        local_path: Path to the local MP4 file.
+        job_id: Job identifier for the S3 key.
+    
+    Returns:
+        Tuple of (s3_key, presigned_url).
+    
+    Raises:
+        ClientError if the upload fails.
+    """
+    s3_key = f"{S3_PREFIX}/{uuid.uuid5()}.mp4"
+    
+    try:
+        s3_client = boto3.client("s3")
+        
+        # Upload the file
+        s3_client.upload_file(
+            Filename=str(local_path),
+            Bucket=S3_BUCKET,
+            Key=s3_key,
+            ExtraArgs={
+                "ContentType": "video/mp4",
+                "Metadata": {
+                    "description": "Chemistry concept videos",
+                }
+            }
+        )
+        
+        # Generate a presigned URL
+        presigned_url = s3_client.generate_presigned_url(
+            ClientMethod="get_object",
+            Params={"Bucket": "eduvid-storage", "Key": s3_key},
+            ExpiresIn=PRESIGNED_URL_EXPIRATION,
+        )
+        
+        return s3_key, presigned_url
+    
+    except ClientError as exc:
+        raise RuntimeError(
+            f"Failed to upload video to S3: {exc}"
+        ) from exc
 
 
 def execute_node(state: WorkflowState) -> WorkflowState:
@@ -105,8 +160,18 @@ def execute_node(state: WorkflowState) -> WorkflowState:
         final_path = OUTPUT_DIR / f"{job_id}.mp4"
         shutil.copy2(produced[0], final_path)
 
+    try:
+        s3_key, presigned_url = _upload_to_s3(local_final_path)
+    except RuntimeError as exc:
+        return {
+            "exec_error": True,
+            "feedback": str(exc),
+        }
+
     return {
         "exec_error": False,
-        "video_path": str(final_path),
+        "video_path": str(local_final_path)
+        "s3_key": s3_key,
+        "video_url": presigned_url,  # Presigned URL for download
         "feedback": "",
     }
