@@ -60,7 +60,7 @@ def _upload_to_s3(local_path: Path) -> tuple[str, str]:
     Raises:
         ClientError if the upload fails.
     """
-    s3_key = f"{S3_PREFIX}/{uuid.uuid5()}.mp4"
+    s3_key = f"{S3_PREFIX}/{uuid.uuid4()}.mp4"
     
     try:
         s3_client = boto3.client("s3")
