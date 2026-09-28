@@ -170,7 +170,7 @@ def execute_node(state: WorkflowState) -> WorkflowState:
 
     return {
         "exec_error": False,
-        "video_path": str(local_final_path)
+        "video_path": str(local_final_path),
         "s3_key": s3_key,
         "video_url": presigned_url,  # Presigned URL for download
         "feedback": "",
