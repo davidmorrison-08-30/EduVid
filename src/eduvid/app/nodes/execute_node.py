@@ -158,7 +158,7 @@ def execute_node(state: WorkflowState) -> WorkflowState:
             }
 
         local_final_path = OUTPUT_DIR / f"{job_id}.mp4"
-        shutil.copy2(produced[0], final_path)
+        shutil.copy2(produced[0], local_final_path)
 
     try:
         s3_key, presigned_url = _upload_to_s3(local_final_path)
