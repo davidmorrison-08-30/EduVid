@@ -157,7 +157,7 @@ def execute_node(state: WorkflowState) -> WorkflowState:
                 f"Scene `{SCENE_CLASS_NAME}` plays at least one animation.",
             }
 
-        final_path = OUTPUT_DIR / f"{job_id}.mp4"
+        local_final_path = OUTPUT_DIR / f"{job_id}.mp4"
         shutil.copy2(produced[0], final_path)
 
     try:
