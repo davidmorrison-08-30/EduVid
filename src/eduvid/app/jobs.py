@@ -52,7 +52,7 @@ def run_job(job_id: str) -> None:
         return
 
     video_url = final_state.get("video_url")
-    if video_path:
+    if video_url:
         _set(job_id, state=JobState.SUCCEEDED, video_url=video_url)
     else:
         _set(
