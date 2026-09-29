@@ -70,7 +70,7 @@ def build_workflow():
     builder.add_node("codegen", codegen_node)
     builder.add_node("alignment", alignment_node)
     builder.add_node("execute", execute_node)
-    builder.add_node("fail", _fail_node)
+    builder.add_node("fail", fail_node)
 
     builder.add_edge(START, "planner")
     builder.add_edge("planner", "codegen")
