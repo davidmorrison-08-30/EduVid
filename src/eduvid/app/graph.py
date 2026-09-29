@@ -24,7 +24,7 @@ from .state import WorkflowState
 from bedrock_agentcore.runtime import BedrockAgentCoreApp
 
 
-def _route_after_codegen(state: WorkflowState) -> str:
+def route_after_codegen(state: WorkflowState) -> str:
     """Safe code proceeds to alignment; unsafe code regenerates until capped."""
     if state.get("safe", False):
         return "alignment"
@@ -33,7 +33,7 @@ def _route_after_codegen(state: WorkflowState) -> str:
     return "fail"
 
 
-def _route_after_alignment(state: WorkflowState) -> str:
+def route_after_alignment(state: WorkflowState) -> str:
     """Aligned code is executed; misaligned code regenerates until capped."""
     if state.get("aligned", False):
         return "execute"
@@ -46,7 +46,7 @@ def _route_after_alignment(state: WorkflowState) -> str:
     return "execute"
 
 
-def _route_after_execute(state: WorkflowState) -> str:
+def route_after_execute(state: WorkflowState) -> str:
     """Successful render ends; render errors regenerate until capped."""
     if not state.get("exec_error", False):
         return "succeed"
@@ -55,7 +55,7 @@ def _route_after_execute(state: WorkflowState) -> str:
     return "fail"
 
 
-def _fail_node(state: WorkflowState) -> WorkflowState:
+def fail_node(state: WorkflowState) -> WorkflowState:
     return {
         "error": state.get("feedback")
         or "Failed to generate a valid video after maximum retries.",
@@ -76,17 +76,17 @@ def build_workflow():
     builder.add_edge("planner", "codegen")
     builder.add_conditional_edges(
         "codegen",
-        _route_after_codegen,
+        route_after_codegen,
         {"alignment": "alignment", "codegen": "codegen", "fail": "fail"},
     )
     builder.add_conditional_edges(
         "alignment",
-        _route_after_alignment,
+        route_after_alignment,
         {"execute": "execute", "codegen": "codegen"},
     )
     builder.add_conditional_edges(
         "execute",
-        _route_after_execute,
+        route_after_execute,
         {"succeed": END, "codegen": "codegen", "fail": "fail"},
     )
     builder.add_edge("fail", END)

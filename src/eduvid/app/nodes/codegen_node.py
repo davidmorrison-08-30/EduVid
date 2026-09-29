@@ -27,7 +27,7 @@ def _strip_code_fence(text: str) -> str:
     return text.strip()
 
 
-def _build_user_message(state: WorkflowState) -> str:
+def build_user_message(state: WorkflowState) -> str:
     plan: Plan = state["plan"]
     parts = [
         f"Chemistry concept: {state['concept']}",

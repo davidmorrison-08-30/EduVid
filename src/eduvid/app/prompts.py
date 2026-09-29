@@ -20,7 +20,7 @@ def _load_manim_notes() -> str:
 MANIM_REFERENCE = _load_manim_notes()
 
 PLAN_SYSTEM_PROMPT = """You are an instructional designer for short educational chemistry videos.
-Given a chemistry concept, extract a structured plan using the chatbot notions of
+Given a chemistry or physics concept, extract a structured plan using the chatbot notions of
 intents and entities:
 - intents: the learner-facing goals of the video (what understanding it should deliver).
 - entities: the concrete chemistry data points to visualize (molecules, atoms, ions,
@@ -33,8 +33,8 @@ Respond with ONLY a JSON object of this exact shape:
 Keep it concise and strictly valid JSON. No prose outside the JSON."""
 
 _CODEGEN_REQUIREMENTS = f"""You are an expert Manim (Community Edition) developer.
-You write a single, self-contained Python script that renders a short, silent,
-educational chemistry animation.
+Write a single, self-contained Python script that renders a short, silent,
+educational animation.
 
 Hard requirements:
 - Define exactly one Scene subclass named `{SCENE_CLASS_NAME}` with a `construct` method.
