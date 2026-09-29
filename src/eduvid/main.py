@@ -1,29 +1,23 @@
-from .app.graph import workflow
-from typing import Dict, Any, Optional
-from bedrock_agentcore.runtime import BedrockAgentCoreApp
-from fastapi import FastAPI
-from .app.schemas import GenerateRequest, GenerateResponse
+from fastapi import BackgroundTasks, FastAPI, HTTPException
+from .app.jobs import create_job, get_job, run_job
+from .app.schemas import GenerateRequest, GenerateResponse, JobStatus
 
 app = FastAPI(title="Chemistry Concept Video Generator", version="1.0.0")
 
-@app.post("/generate")
-async def generate(request: GenerateRequest):
-    # Extract prompt and session ID from AgentCore request context
-    concept = request.concept
-    # session_id = getattr(context, "session_id", "default-session")
+@app.post("/generate", response_model=GenerateResponse)
+async def generate(request: GenerateRequest, background_tasks: BackgroundTasks)-> GenerateResponse:
+    job = create_job(request.concept)
+    background_tasks.add_task(run_job, job.job_id)
 
-    # config = {"configurable": {"thread_id": session_id}}
-    initial_state = {
-        "job_id": "",
-        "concept": concept,
-        "codegen_iterations": 0,
-        "alignment_iterations": 0,
-    }
-    result = await workflow.ainvoke(
-        initial_state
-    )
+    return GenerateResponse(job_id=job.job_id, state=job.state)
 
-    return {"output_dir": result.get("video_path"), "s3_key": result.get("s3_key")}
+@app.get("/status/{job_id}", response_model=JobStatus)
+def status(job_id: str) -> JobStatus:
+    """Return the current job status, including the saved video path when done."""
+    job = get_job(job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail="Job not found")
+    return job
 
 @app.get("/ping")
 async def ping():

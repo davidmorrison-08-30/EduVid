@@ -51,9 +51,9 @@ def run_job(job_id: str) -> None:
         _set(job_id, state=JobState.FAILED, error=str(exc))
         return
 
-    video_path = final_state.get("video_path")
+    video_url = final_state.get("video_url")
     if video_path:
-        _set(job_id, state=JobState.SUCCEEDED, video_path=video_path)
+        _set(job_id, state=JobState.SUCCEEDED, video_url=video_url)
     else:
         _set(
             job_id,

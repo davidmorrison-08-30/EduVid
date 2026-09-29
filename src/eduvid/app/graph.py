@@ -59,7 +59,7 @@ def _fail_node(state: WorkflowState) -> WorkflowState:
     return {
         "error": state.get("feedback")
         or "Failed to generate a valid video after maximum retries.",
-        "video_path": None,
+        "video_url": None,
     }
 
 

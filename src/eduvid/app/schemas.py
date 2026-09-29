@@ -34,7 +34,7 @@ class JobStatus(BaseModel):
     job_id: str
     state: JobState
     concept: str
-    video_path: Optional[str] = None
+    video_url: Optional[str] = None
     error: Optional[str] = None
 
 

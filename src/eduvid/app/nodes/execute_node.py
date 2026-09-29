@@ -47,7 +47,7 @@ def _truncate(text: str, limit: int = 2000) -> str:
     return text if len(text) <= limit else text[-limit:]
 
 
-def _upload_to_s3(local_path: Path) -> tuple[str, str]:
+def _upload_to_s3(local_path: Path) -> str:
     """Upload video to S3 and return (s3_key, presigned_url).
     
     Args:
@@ -85,7 +85,7 @@ def _upload_to_s3(local_path: Path) -> tuple[str, str]:
             ExpiresIn=PRESIGNED_URL_EXPIRATION,
         )
         
-        return s3_key, presigned_url
+        return presigned_url
     
     except ClientError as exc:
         raise RuntimeError(
@@ -157,11 +157,11 @@ def execute_node(state: WorkflowState) -> WorkflowState:
                 f"Scene `{SCENE_CLASS_NAME}` plays at least one animation.",
             }
 
-        local_final_path = OUTPUT_DIR / f"{job_id}.mp4"
-        shutil.copy2(produced[0], local_final_path)
+        local_path = OUTPUT_DIR / f"{job_id}.mp4"
+        shutil.copy2(produced[0], local_path)
 
     try:
-        s3_key, presigned_url = _upload_to_s3(local_final_path)
+        presigned_url = _upload_to_s3(local_path)
     except RuntimeError as exc:
         return {
             "exec_error": True,
@@ -170,8 +170,6 @@ def execute_node(state: WorkflowState) -> WorkflowState:
 
     return {
         "exec_error": False,
-        "video_path": str(local_final_path),
-        "s3_key": s3_key,
         "video_url": presigned_url,  # Presigned URL for download
         "feedback": "",
     }

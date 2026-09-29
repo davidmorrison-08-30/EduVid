@@ -22,7 +22,7 @@ class WorkflowState(TypedDict, total=False):
         exec_error: Whether the last render attempt failed.
         codegen_iterations: Number of code-generation attempts.
         alignment_iterations: Number of alignment evaluations performed.
-        video_path: Final saved MP4 path (set on success).
+        video_url: AWS S3 presigned URL of the video
         error: Terminal error message (set on failure).
     """
 
@@ -36,6 +36,5 @@ class WorkflowState(TypedDict, total=False):
     exec_error: bool
     codegen_iterations: int
     alignment_iterations: int
-    video_path: Optional[str]
-    s3_key: Optional[str]
+    video_url: Optional[str]
     error: Optional[str]
