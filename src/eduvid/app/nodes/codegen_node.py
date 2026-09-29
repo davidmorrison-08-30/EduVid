@@ -48,7 +48,7 @@ def build_user_message(state: WorkflowState) -> str:
 def codegen_node(state: WorkflowState) -> WorkflowState:
     messages = [
         {"role": "system", "content": CODEGEN_SYSTEM_PROMPT},
-        {"role": "user", "content": _build_user_message(state)},
+        {"role": "user", "content": build_user_message(state)},
     ]
     code = _strip_code_fence(chat(messages, max_tokens=6000))
 
