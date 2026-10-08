@@ -51,3 +51,13 @@ def get_llm_config(secret_name: str) -> LLMConfig:
         region=all_secrets["AWS_REGION"],
         model=all_secrets["AWS_MODEL"],
     )
+
+@lru_cache(maxsize=1)
+def get_appsync_config(secret_name: str) -> dict:
+    """Read the AppSync API settings from config.json."""
+    all_secrets = get_secrets(secret_name)
+    return {
+        "api_key": all_secrets["APPSYNC_API_KEY"],
+        "graphql_url": all_secrets["APPSYNC_GRAPHQL"],
+        "realtime_url": all_secrets["APPSYNC_REALTIME"]
+    }
