@@ -20,9 +20,8 @@ from .config import all_secrets
 
 def get_client():
     """Build a cached Bedrock Runtime client authenticated via the API key."""
-    return boto3.client("bedrock-runtime", 
-                         region_name=all_secrets["region"], 
-                         aws_bearer_token_bedrock=all_secrets["bedrock_token"])
+    os.environ["AWS_BEARER_TOKEN_BEDROCK"] = all_secrets["bedrock_token"]
+    return boto3.client("bedrock-runtime", region_name=all_secrets["region"])
 
 
 def _to_converse(messages: list[dict[str, str]]) -> tuple[list[dict], list[dict]]:
