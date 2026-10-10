@@ -18,14 +18,7 @@ MAX_CODEGEN_RETRIES = 5
 RENDER_TIMEOUT_SECONDS = 360
 
 
-@dataclass(frozen=True)
-class LLMConfig:
-    bedrock_token: str
-    region: str
-    model: str
-
-
-def get_secrets(secret_name: str):
+def get_secret_dict(secret_name: str):
 
     # Create a Secrets Manager client
     session = boto3.session.Session()
@@ -42,22 +35,18 @@ def get_secrets(secret_name: str):
     return json.loads(secret_json)
 
 
-@lru_cache(maxsize=1)
-def get_llm_config(secret_name: str) -> LLMConfig:
+def get_all_secrets(secret_name: str) -> LLMConfig:
     """Read the Amazon Bedrock LLM settings from config.json."""
-    all_secrets = get_secrets(secret_name)
-    return LLMConfig(
-        bedrock_token=all_secrets["AWS_BEARER_TOKEN_BEDROCK"],
-        region=all_secrets["AWS_REGION"],
-        model=all_secrets["AWS_MODEL"],
-    )
-
-@lru_cache(maxsize=1)
-def get_appsync_config(secret_name: str) -> dict:
-    """Read the AppSync API settings from config.json."""
-    all_secrets = get_secrets(secret_name)
-    return {
-        "api_key": all_secrets["APPSYNC_API_KEY"],
-        "graphql_url": all_secrets["APPSYNC_GRAPHQL"],
-        "realtime_url": all_secrets["APPSYNC_REALTIME"]
+    all_secrets = get_secret_dict(secret_name)
+    all_secrets = {
+        "bedrock_token": all_secrets["AWS_BEARER_TOKEN_BEDROCK"],
+        "region": all_secrets["AWS_REGION"],
+        "model": all_secrets["AWS_MODEL"],
+        "appsync_key": all_secrets["APPSYNC_API_KEY"],
+        "appsync_graphql": all_secrets["APPSYNC_GRAPHQL"],
+        "appsync_realtime": all_secrets["APPSYNC_REALTIME"]
     }
+
+    return all_secrets
+
+all_secrets = get_all_secrets("eduvid-secrets")

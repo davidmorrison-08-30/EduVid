@@ -16,16 +16,13 @@ from typing import Any
 
 import boto3
 
-from .config import get_llm_config
+from .config import all_secrets
 
-
-@lru_cache(maxsize=1)
 def get_client():
     """Build a cached Bedrock Runtime client authenticated via the API key."""
-    cfg = get_llm_config("eduvid-secrets")
-    # The Bedrock API key is consumed by botocore as a bearer token.
-    os.environ["AWS_BEARER_TOKEN_BEDROCK"] = cfg.bedrock_token
-    return boto3.client("bedrock-runtime", region_name=cfg.region)
+    return boto3.client("bedrock-runtime", 
+                         region_name=all_secrets["region"], 
+                         aws_bearer_token_bedrock=all_secrets["bedrock_token"])
 
 
 def _to_converse(messages: list[dict[str, str]]) -> tuple[list[dict], list[dict]]:
@@ -54,11 +51,11 @@ def chat(
     max_tokens: int = 4096,
 ) -> str:
     """Run a Bedrock converse call and return the assistant text content."""
-    cfg = get_llm_config("eduvid-secrets")
+
     system, converse_messages = _to_converse(messages)
 
     kwargs: dict[str, Any] = {
-        "modelId": cfg.model,
+        "modelId": all_secrets["model"],
         "messages": converse_messages,
         "inferenceConfig": {"maxTokens": max_tokens, "temperature": temperature},
     }

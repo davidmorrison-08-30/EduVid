@@ -7,11 +7,10 @@ from typing import Dict
 
 from .graph import workflow
 from .schemas import JobState, JobStatus
-from .config import get_appsync_config
+from .config import all_secrets
 
 _jobs: Dict[str, JobStatus] = {}
 _lock = threading.Lock()
-appsync_cfg = get_appsync_config("eduvid-appsync")
 
 
 def create_job(concept: str) -> JobStatus:
@@ -54,11 +53,11 @@ def notify_job_completion(job_id: str,
     
     headers = {
         "Content-Type": "application/json",
-        "x-api-key": cfg["APPSYNC_API_KEY"]
+        "x-api-key": all_secrets["appsync_key"]
     }
     
     response = requests.post(
-        cfg["APPSYNC_GRAPHQL"], 
+        all_secrets["appsync_graphql"], 
         json={"query": query, "variables": variables}, 
         headers=headers
     )
