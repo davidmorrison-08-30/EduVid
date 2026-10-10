@@ -19,11 +19,11 @@ def _load_manim_notes() -> str:
 
 MANIM_REFERENCE = _load_manim_notes()
 
-PLAN_SYSTEM_PROMPT = """You are an instructional designer for short educational chemistry videos.
+PLAN_SYSTEM_PROMPT = """You are an instructional designer for short educational videos.
 Given a chemistry or physics concept, extract a structured plan using the chatbot notions of
 intents and entities:
 - intents: the learner-facing goals of the video (what understanding it should deliver).
-- entities: the concrete chemistry data points to visualize (molecules, atoms, ions,
+- entities: the concrete physics/chemistry data points to visualize (molecules, atoms, ions,
   bond types, reactions, quantities, states of matter, etc.).
 - scene_plan: an ordered list of short visual beats describing what appears on
   screen over time (title, build-up, key idea, summary).
