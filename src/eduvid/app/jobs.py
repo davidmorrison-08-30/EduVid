@@ -51,7 +51,7 @@ def notify_job_completion(job_id: str,
     variables = {
         "jobId": job_id,
         "status": status,
-        "videoUrl": video_url
+        "videoUrl": video_url,
         "error": error
     }
     
@@ -96,6 +96,6 @@ def run_job(job_id: str) -> None:
         _set(
             job_id,
             state=JobState.FAILED,
-            error=error,
+            error=error
         )
         notify_job_completion(job_id, status=JobState.FAILED, error=error)
