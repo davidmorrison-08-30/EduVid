@@ -46,7 +46,7 @@ Hard requirements:
 - Do NOT read or write any files or access the network. The only output is the rendered video.
 - Use only Pango `Text(...)` for text. NEVER use `Tex`, `MathTex`, or anything LaTeX-based.
 - Keep the total animation roughly 12-25 seconds; use self.play(...) and self.wait(...).
-- Visualize chemistry with shapes (Circle for atoms/electrons, Line for bonds, VGroup for
+- Visualize the physics/chemistry with shapes (Circle for atoms/electrons, Line for bonds, VGroup for
   molecules), colors, and Text labels. Keep elements on-screen and non-overlapping.
 - The code must run headless and be deterministic."""
 
@@ -72,7 +72,7 @@ CODEGEN_SYSTEM_PROMPT = "\n\n".join(
 )
 
 ALIGNMENT_SYSTEM_PROMPT = """You are a strict reviewer checking whether a Manim script faithfully
-implements an educational plan for a chemistry concept.
+implements an educational plan for a physics/chemistry concept.
 
 You are given the concept, its intents, entities, scene_plan, and the candidate script.
 Decide whether the script visually covers the intents and the key entities and broadly

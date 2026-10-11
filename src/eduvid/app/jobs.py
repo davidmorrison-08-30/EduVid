@@ -1,6 +1,7 @@
 """In-memory async job store and workflow runner."""
 from __future__ import annotations
 
+import requests
 import threading
 import uuid
 from typing import Dict
@@ -35,13 +36,15 @@ def _set(job_id: str, **fields) -> None:
 
 def notify_job_completion(job_id: str, 
                           status: str,
-                          video_url: str=""):
+                          video_url: str="",
+                          error: str=""):
     query = """
-    mutation PublishJobStatus($jobId: ID!, $status: String!, $videoUrl: String) {
-      publishJobStatus(jobId: $jobId, status: $status, videoUrl: $videoUrl) {
+    mutation PublishJobStatus($jobId: ID!, $status: String!, $videoUrl: String, $error: String) {
+      publishJobStatus(jobId: $jobId, status: $status, videoUrl: $videoUrl, error: $error) {
         jobId
         status
         videoUrl
+        error
       }
     }
     """
@@ -49,6 +52,7 @@ def notify_job_completion(job_id: str,
         "jobId": job_id,
         "status": status,
         "videoUrl": video_url
+        "error": error
     }
     
     headers = {
@@ -80,6 +84,7 @@ def run_job(job_id: str) -> None:
         final_state = workflow.invoke(initial_state)
     except Exception as exc:  # noqa: BLE001 - surface any failure to the caller
         _set(job_id, state=JobState.FAILED, error=str(exc))
+        notify_job_completion(job_id, status=JobState.FAILED, error=error)
         return
 
     video_url = final_state.get("video_url")
@@ -87,9 +92,10 @@ def run_job(job_id: str) -> None:
         _set(job_id, state=JobState.SUCCEEDED, video_url=video_url)
         notify_job_completion(job_id, status=JobState.SUCCEEDED, video_url=video_url)
     else:
+        error = final_state.get("error", "Unknown workflow failure.")
         _set(
             job_id,
             state=JobState.FAILED,
-            error=final_state.get("error", "Unknown workflow failure."),
+            error=error,
         )
-        notify_job_completion(job_id, status=JobState.FAILED)
+        notify_job_completion(job_id, status=JobState.FAILED, error=error)
