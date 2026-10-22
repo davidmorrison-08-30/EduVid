@@ -38,6 +38,12 @@ jobs:
           touch .env
           echo SECRET_STORE_NAME=${{ secrets.SECRET_STORE_NAME }} >> .env
           cat .env
+          if [ -z "$VAR_VALUE" ]; then
+            echo "❌ MY_VAR_NAME is empty!"
+            exit 1  # Fail the step if it's empty
+          else
+            echo "✅ MY_VAR_NAME is not empty"
+          fi
 
       - name: Print OIDC-related context
         run: |
