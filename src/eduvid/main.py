@@ -1,7 +1,7 @@
 import uvicorn
 from fastapi import BackgroundTasks, FastAPI, HTTPException
-from app.jobs import create_job, get_job, run_job
-from app.schemas import GenerateRequest, GenerateResponse, JobStatus
+from .app.jobs import create_job, get_job, run_job
+from .app.schemas import GenerateRequest, GenerateResponse, JobStatus
 
 
 app = FastAPI(title="Chemistry Concept Video Generator", version="1.0.0")
