@@ -15,7 +15,7 @@ env:
   ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
   ECS_TASK_DEFINITION: task-definition.json
   CONTAINER_NAME: ${{ secrets.REPO_NAME }}
-  SECRET_STORE_NAME: ${{ secrets.SECRET_STORE_NAME }}
+  # SECRET_STORE_NAME: ${{ secrets.SECRET_STORE_NAME }}
 
 jobs:
   deploy:
@@ -38,11 +38,12 @@ jobs:
           touch .env
           echo SECRET_STORE_NAME=${{ secrets.SECRET_STORE_NAME }} >> .env
           cat .env
+          VAR_VALUE=$(grep "^SECRET_STORE_NAME=" .env | cut -d'=' -f2-)
           if [ -z "$VAR_VALUE" ]; then
-            echo "❌ MY_VAR_NAME is empty!"
+            echo "❌ SECRET_STORE_NAME is empty!"
             exit 1  # Fail the step if it's empty
           else
-            echo "✅ MY_VAR_NAME is not empty"
+            echo "✅ SECRET_STORE_NAME is not empty"
           fi
 
       - name: Print OIDC-related context
