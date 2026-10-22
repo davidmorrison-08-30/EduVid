@@ -1,10 +1,10 @@
 """Pydantic models for the API and the workflow."""
 from __future__ import annotations
-
 from enum import Enum
-from typing import List, Optional
-
+from typing import List, Optional, Annotated
+from typing_extensions import TypedDict
 from pydantic import BaseModel, Field
+from .nodes.e2b_backend import ScopedE2BSandbox
 
 
 class GenerateRequest(BaseModel):
@@ -38,16 +38,25 @@ class JobStatus(BaseModel):
     error: Optional[str] = None
 
 
-class Plan(BaseModel):
-    """Structured output of the plan node (intents + entities)."""
+class WorkflowState(TypedDict, total=False):
+    """State threaded through the video-generation workflow.
 
-    intents: List[str] = Field(default_factory=list)
-    entities: List[str] = Field(default_factory=list)
-    scene_plan: List[str] = Field(default_factory=list)
+    Attributes:
+        job_id: Identifier used to name the output video
+        question: User's question
+        answer: LLM-generated answer
+        agent_iterations: Number of agent attempts
+        answer_iterations: Number of answering attempts
+        video_url: AWS S3 presigned URL of the video
+        error: Accumulated error messages from agent and answer nodes
+    """
 
-
-class AlignmentVerdict(BaseModel):
-    """Result of the code-text alignment evaluation node."""
-
-    aligned: bool = False
-    feedback: str = ""
+    job_id: str
+    question: str
+    answer: str
+    agent_iterations: int
+    answer_iterations: int
+    agent_error: Optional[str]
+    answer_error: Optional[str]
+    error: Optional[str]
+    video_url: Optional[str]

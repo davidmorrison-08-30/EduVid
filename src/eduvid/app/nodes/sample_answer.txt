@@ -1,0 +1,72 @@
+To find the minimum horizontal force $F$ applied at the axle required to pull or push a wheel over a step/block of height $h$, we can analyze the torque (moments) acting on the wheel at the instant it begins to lift off the ground.
+
+---
+
+## 1. Physical Setup & Geometry
+
+* **Radius of the wheel:** $R$
+* **Weight of the wheel:** $W$ (acting downward through the center/axle $O$)
+* **Height of the block:** $h$
+* **Horizontal force:** $F$ (acting horizontally through the center/axle $O$)
+
+When the wheel is just on the verge of lifting off the flat ground, the contact force from the ground becomes zero. The wheel rotates about the corner contact point of the block, which we will call **pivot point $P$**.
+
+```text
+       F ---> O  (Axle)
+             /|
+            / | 
+           /  | (R - h)
+          /   |
+         P----+  
+        (Corner of block)
+          d_W
+
+```
+
+### Distances from the Pivot $P$ to the Center $O$:
+
+1. **Vertical distance** from $P$ to $O$:
+
+$$y = R - h$$
+
+
+2. **Horizontal distance** ($d_W$) from $P$ to the vertical line through $O$ (the lever arm for weight $W$):
+Using the Pythagorean theorem on the right triangle formed by $O$, $P$, and the horizontal line from $P$ to the center line:
+
+$$d_W = \sqrt{R^2 - (R - h)^2} = \sqrt{R^2 - (R^2 - 2Rh + h^2)} = \sqrt{2Rh - h^2}$$
+
+
+3. **Vertical distance** ($d_F$) from $P$ to the line of action of horizontal force $F$ (the lever arm for force $F$):
+
+$$d_F = R - h$$
+
+
+
+---
+
+## 2. Torque Equilibrium
+
+Taking moments about the pivot point $P$ at the threshold of lifting ($d_W$ creates a clockwise torque restoring the wheel, $d_F$ creates a counterclockwise torque lifting the wheel):
+
+$$\sum \tau_P = 0 \implies F \cdot d_F = W \cdot d_W$$
+
+Substitute the lever arms:
+
+$$F (R - h) = W \sqrt{2Rh - h^2}$$
+
+Solving for $F$:
+
+$$F = W \frac{\sqrt{2Rh - h^2}}{R - h}$$
+
+---
+
+## Summary of the Result
+
+The horizontal force $F$ required to push the wheel over the block is:
+
+$$F = W \frac{\sqrt{2Rh - h^2}}{R - h}$$
+
+### Key Insights & Edge Cases:
+
+* **Constraint:** The step height $h$ must be strictly less than $R$ ($h < R$). As $h \to R$, the denominator $(R - h) \to 0$, meaning an infinite horizontal force through the center would be needed to overcome a block as tall as the axle height.
+* **Minimum force direction:** If $F$ were not restricted to being strictly horizontal, the minimum force necessary would be applied perpendicular to the line connecting $P$ and $O$.

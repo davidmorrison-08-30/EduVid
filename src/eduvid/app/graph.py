@@ -1,64 +1,47 @@
 """Assemble the LangGraph video-generation workflow.
 
-Flow (see wf_planning.txt):
+Flow:
 
-    START -> plan -> codegen -> alignment -> execute -> END
-                       ^   |        |           |
-                       |   |(unsafe)|(misaligned)|(render error)
-                       +---+--------+-----------+
+  START -> answer -> code agent -> END
+          ^     |        ^    |      
+          |--error       |--error
 
-All back-edges return to ``codegen`` and are bounded by iteration caps so the
-graph always terminates.
 """
+
 from __future__ import annotations
-
 from langgraph.graph import END, START, StateGraph
-
-from .config import MAX_ALIGNMENT_RETRIES, MAX_CODEGEN_RETRIES
-from .nodes.alignment_node import alignment_node
-from .nodes.codegen_node import codegen_node
-from .nodes.execute_node import execute_node
-from .nodes.plan_node import plan_node
-from .state import WorkflowState
-
-from bedrock_agentcore.runtime import BedrockAgentCoreApp
+from .utils.config import MAX_ANSWER_RETRIES, MAX_AGENT_RETRIES
+from .nodes.answer_node import answer_node
+from .nodes.coding_agent import agent_node 
+from .schemas import WorkflowState
 
 
-def route_after_codegen(state: WorkflowState) -> str:
-    """Safe code proceeds to alignment; unsafe code regenerates until capped."""
-    if state.get("safe", False):
-        return "alignment"
-    if state.get("codegen_iterations", 0) < MAX_CODEGEN_RETRIES:
-        return "codegen"
+def route_after_answer(state: WorkflowState) -> str:
+    """Successful answer returned by LLM proceeds to next node; failed one gets regenerated"""
+    if not state.get("answer_error", False):
+        return "agent"
+    if state.get("answer_iterations", 0) < MAX_ANSWER_RETRIES:
+        return "answer"
     return "fail"
 
 
-def route_after_alignment(state: WorkflowState) -> str:
-    """Aligned code is executed; misaligned code regenerates until capped."""
-    if state.get("aligned", False):
-        return "execute"
-    if (
-        state.get("alignment_iterations", 0) < MAX_ALIGNMENT_RETRIES
-        and state.get("codegen_iterations", 0) < MAX_CODEGEN_RETRIES
-    ):
-        return "codegen"
-    # Out of retries: proceed with the best available code.
-    return "execute"
-
-
-def route_after_execute(state: WorkflowState) -> str:
+def route_after_agent(state: WorkflowState) -> str:
     """Successful render ends; render errors regenerate until capped."""
-    if not state.get("exec_error", False):
+    if not state.get("agent_error", False):
         return "succeed"
-    if state.get("codegen_iterations", 0) < MAX_CODEGEN_RETRIES:
-        return "codegen"
+    if state.get("agent_iterations", 0) < MAX_AGENT_RETRIES:
+        return "agent"
     return "fail"
 
 
 def fail_node(state: WorkflowState) -> WorkflowState:
+    error = ""
+    if state.get("answer_error", False):
+        error = error + f"Error in answering the user's question: {state["answer_error"]}\n"
+    if state.get("agent_error", False):
+        error = error + f"Error in video generation: {state["codegen_error"]}\n"
     return {
-        "error": state.get("feedback")
-        or "Failed to generate a valid video after maximum retries.",
+        "error": error,
         "video_url": None,
     }
 
@@ -66,33 +49,24 @@ def fail_node(state: WorkflowState) -> WorkflowState:
 def build_workflow():
     builder = StateGraph(WorkflowState)
 
-    builder.add_node("planner", plan_node)
-    builder.add_node("codegen", codegen_node)
-    builder.add_node("alignment", alignment_node)
-    builder.add_node("execute", execute_node)
+    builder.add_node("answer", answer_node)
+    builder.add_node("agent", agent_node)
     builder.add_node("fail", fail_node)
 
-    builder.add_edge(START, "planner")
-    builder.add_edge("planner", "codegen")
+    builder.add_edge(START, "answer")
     builder.add_conditional_edges(
-        "codegen",
-        route_after_codegen,
-        {"alignment": "alignment", "codegen": "codegen", "fail": "fail"},
+        "answer",
+        route_after_answer,
+        {"answer": "answer", "agent": "agent", "fail": "fail"},
     )
     builder.add_conditional_edges(
-        "alignment",
-        route_after_alignment,
-        {"execute": "execute", "codegen": "codegen"},
-    )
-    builder.add_conditional_edges(
-        "execute",
-        route_after_execute,
-        {"succeed": END, "codegen": "codegen", "fail": "fail"},
+        "agent",
+        route_after_agent,
+        {"succeed": END, "agent": "agent", "fail": "fail"},
     )
     builder.add_edge("fail", END)
 
     return builder.compile()
 
 
-# Compiled once and reused across requests.
 workflow = build_workflow()

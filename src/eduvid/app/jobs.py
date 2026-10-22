@@ -5,14 +5,12 @@ import requests
 import threading
 import uuid
 from typing import Dict
-
 from .graph import workflow
 from .schemas import JobState, JobStatus
-from .config import all_secrets
+from .utils.config import all_secrets
 
 _jobs: Dict[str, JobStatus] = {}
 _lock = threading.Lock()
-
 
 def create_job(concept: str) -> JobStatus:
     job_id = uuid.uuid4().hex
@@ -76,15 +74,15 @@ def run_job(job_id: str) -> None:
     _set(job_id, state=JobState.RUNNING)
     initial_state = {
         "job_id": job_id,
-        "concept": job.concept,
-        "codegen_iterations": 0,
-        "alignment_iterations": 0,
+        "question": job.concept,
+        "agent_iterations": 0,
+        "answer_iterations": 0,
     }
     try:
         final_state = workflow.invoke(initial_state)
-    except Exception as exc:  # noqa: BLE001 - surface any failure to the caller
-        _set(job_id, state=JobState.FAILED, error=str(exc))
-        notify_job_completion(job_id, status=JobState.FAILED, error=error)
+    except Exception as err:  
+        _set(job_id, state=JobState.FAILED, error=str(err))
+        notify_job_completion(job_id, status=JobState.FAILED, error=str(err))
         return
 
     video_url = final_state.get("video_url")
