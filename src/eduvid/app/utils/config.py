@@ -7,7 +7,7 @@ import boto3
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 
 MAX_ANSWER_RETRIES = 6
 MAX_AGENT_RETRIES = 6
@@ -43,5 +43,5 @@ def get_all_secrets(secret_name: str) -> LLMConfig:
 
     return all_secrets
 
-load_dotenv()
+load_dotenv(find_dotenv())
 all_secrets = get_all_secrets(os.environ.get("SECRET_STORE_NAME"))
