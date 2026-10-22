@@ -24,6 +24,7 @@ WORKDIR /app
 
 COPY pyproject.toml uv.lock ./
 COPY src ./src
+COPY .env .env
 
 # Install dependencies (including strands-agents)
 RUN uv sync --frozen --no-cache
