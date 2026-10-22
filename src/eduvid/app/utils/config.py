@@ -44,4 +44,4 @@ def get_all_secrets(secret_name: str) -> LLMConfig:
     return all_secrets
 
 load_dotenv()
-all_secrets = get_all_secrets(os.getenv("SECRET_STORE_NAME"))
+all_secrets = get_all_secrets(os.environ.get("SECRET_STORE_NAME"))
