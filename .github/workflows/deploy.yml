@@ -15,7 +15,7 @@ env:
   ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
   ECS_TASK_DEFINITION: task-definition.json
   CONTAINER_NAME: ${{ secrets.REPO_NAME }}
-  # SECRET_STORE_NAME: ${{ secrets.SECRET_STORE_NAME }}
+  SECRET_STORE_NAME: ${{ secrets.SECRET_STORE_NAME }}
 
 jobs:
   deploy:
