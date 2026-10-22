@@ -13,7 +13,7 @@ wheels/
 .cursor/
 
 # .env
-.env
+*.env
 
 # outputs
 outputs/
@@ -27,3 +27,12 @@ ecs*.json
 
 # bash files
 *.sh
+
+# E2B template build
+e2b_template.py
+
+# Test scripts
+test_*.py
+
+# Installation requirements
+requirements.txt

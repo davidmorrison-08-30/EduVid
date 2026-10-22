@@ -9,12 +9,20 @@ requires-python = ">=3.12"
 dependencies = [
     "bedrock-agentcore>=1.23.1",
     "boto3>=1.43.98",
+    "botocore[crt]>=1.43.98",
+    "deepagents>=0.7.24",
+    "e2b-code-interpreter>=2.10.5",
     "fastapi>=0.141.1",
     "httpx>=0.28.1",
+    "langchain-aws>=1.8.2",
+    "langchain-core>=1.6.10",
+    "langchain-e2b>=0.0.6",
     "langgraph>=1.2.11",
     "manim>=0.21.0",
+    "manimgl>=1.7.2",
     "pydantic>=2.13.5",
     "python-dotenv>=1.2.3",
+    "setuptools<82",
     "strands-agents>=1.56.0",
     "uvicorn[standard]>=0.53.0",
 ]
@@ -25,3 +33,9 @@ eduvid = "eduvid:main"
 [build-system]
 requires = ["uv_build>=0.12.17,<0.13.0"]
 build-backend = "uv_build"
+
+[tool.uv]
+override-dependencies = [
+    "deepagents==0.7.25",
+    "wcmatch>=11.0"
+]
