@@ -162,6 +162,8 @@ Answer:
             if isinstance(message, ToolMessage):
                 if message.name == "upload_video":
                     presigned_url = message.content
+                    break
+        logger.info(f"S3 PRESIGNED URL: {presigned_url}")
         state["video_url"] = presigned_url  # temporary
     except Exception as err:
         state["agent_error"] = str(err)
